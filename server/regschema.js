@@ -13,6 +13,7 @@ let Registerr = new mongoose.Schema({
     email :{
         type : String,
         required:true,
+        unique: true
     },
     gender : {
         type : String,
@@ -27,6 +28,16 @@ let Registerr = new mongoose.Schema({
     },password :{
         type : String,
         required:true,
+        unique: true
+    },
+    bloodGroup :{
+        type : String,
+        required : true,
+    },
+    Contact:{
+        type: String,
+        required : true,
+        unique: true,
     }
 },options)
 
