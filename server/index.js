@@ -7,6 +7,7 @@ const Os=require('./o.js')
 const sendMail = require("./controllers/sendMail");
 const session = require('express-session');
 const cors = require('cors');
+const { TopologyDescription } = require('mongodb');
 app.use(cors({
     origin: '*'
 }))
@@ -55,17 +56,6 @@ app.post('/patients/:bloodGroup', async (req, res) => {
     }
 });
 
-app.post('/bloodgroup',async(req,res)=>{
-    const {name,count}=req.body;
-    const fo=await Os.findOne({name});
-    const result=await Os.updateOne({name},{
-        $set:{
-            count:parseInt(fo.count)+parseInt(count)
-        }
-    });
-    res.send("Updated")
-})
-
 app.post('/login',async (req, res) => {
     const { username, password } = req.body;
 
@@ -84,13 +74,43 @@ app.post('/login',async (req, res) => {
     }
 }
 )
-app.post('/dashboard', (req, res) => {
+app.post('/dashboard',async (req, res) => {
     if (req.session.adminId) {
         res.send("logged in")
     } else {
         res.send("not logged in")
     }
   });
+
+app.post('/patients/all',async (req,res)=>{
+    if(req.session.adminId){
+        try {
+            const records = await Registerr.find().limit(15);
+            res.status(200).json(records);
+          } catch (error) {
+            res.status(500).json({ error: 'Failed to fetch records' });
+          }
+    }
+    else{
+        res.status(500).json({error: 'login first to see the data'});
+    }
+})
+app.post('/patients/add',async (req,res)=>{
+    if(req.session.adminId){
+        try{
+        const {fullname,email,gender,age,city,bloodGroup,Contact} = req.body;
+        let newUser = new Registerr({fullname,email,gender,age,city,bloodGroup,Contact})
+        await newUser.save();
+        res.send('Registered Successfully')
+        }
+        catch(error){
+            res.status(500).json({ error: 'failed to add records' });
+        }
+    }
+    else{
+        req.status(500).json({error: 'failed to add records'})
+    }
+})
 
 app.post("/mail", sendMail);
 

@@ -25,10 +25,6 @@ let Registerr = new mongoose.Schema({
     },city :{
         type : String,
         required:true,
-    },password :{
-        type : String,
-        required:true,
-        unique: true
     },
     bloodGroup :{
         type : String,
